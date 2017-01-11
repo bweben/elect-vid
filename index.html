@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <link rel="stylesheet" href="./stylesheet.css">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="./js/jquery-2.2.0.min.js"></script>
+    <script>if (window.module) module = window.module;</script>
+  </head>
+  <body>
+    <!--<img src="imgs/html_cool.jpg" style="position:fixed; top:0; left:0; width: 20em">-->
+    <div id="video-wrapper">
+    <video id="video2" class="player">
+      <source src="vids/test.mp4" type="video/mp4">
+      Your browser does not support HTML5 video.
+    </video>
+
+      <video id="video1" class="player">
+        <source src="vids/hallo.mp4" type="video/mp4">
+        Your browser does not support HTML5 video.
+      </video>
+    </div>
+  </body>
+
+  <script>
+    // You can also require other files to run in this process
+    require('./renderer.js');
+    const {ipcRenderer} = require('electron')
+
+    ipcRenderer.on('opacity-changed', function (event, arg) {
+        $("#video1").fadeTo("fast",arg/100);
+    });
+
+    var myVideo = document.getElementById("video1");
+    var myVideo2 = document.getElementById("video2");
+    myVideo.play();
+    myVideo2.play();
+  </script>
+</html>
