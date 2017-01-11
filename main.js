@@ -13,11 +13,11 @@ const url = require('url')
 let mainWindow;
 let secWindow;
 
-function createWindow () {
-  var electronScreen = electron.screen;
-  var size = electronScreen.getPrimaryDisplay().workAreaSize;
-  var displays = electronScreen.getAllDisplays();
-  var externalDisplay = null;
+function createWindow() {
+    var electronScreen = electron.screen;
+    var size = electronScreen.getPrimaryDisplay().workAreaSize;
+    var displays = electronScreen.getAllDisplays();
+    var externalDisplay = null;
 
     for (var i in displays) {
         if (displays[i].bounds.x != 0 || displays[i].bounds.y != 0) {
@@ -29,40 +29,44 @@ function createWindow () {
     if (externalDisplay) {
         secWindow = new BrowserWindow({
             x: externalDisplay.bounds.x + 50,
-            y: externalDisplay.bounds.y + 50
+            y: externalDisplay.bounds.y + 50,
+            frame: false,
+            fullscreen: true
         });
     }
 
-  // Create the browser window.
-  mainWindow = new BrowserWindow({width: size.width, height: size.height, frame:false, fullscreen: true})
+    // Create the browser window.
+    mainWindow = new BrowserWindow({width: 400, height: 500, frame: true, fullscreen: false})
 
-  // and load the index.html of the app.
-  mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, 'index.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
+    // and load the index.html of the app.
+    mainWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'external/index.html'),
+        protocol: 'file:',
+        slashes: true
+    }))
 
     secWindow.loadURL(url.format({
-      pathname: path.join(__dirname, 'external/index.html'),
+        pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
         slashes: true
     }));
 
-  // Open the DevTools.
-  //mainWindow.webContents.openDevTools()
+    // Open the DevTools.
+    //secWindow.webContents.openDevTools()
 
     ipcMain.on('opacity-changed', function (event, arg) {
-        mainWindow.webContents.send('opacity-changed', arg);
+        secWindow.webContents.send('opacity-changed', arg);
     })
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null
-  })
+    // Emitted when the window is closed.
+    mainWindow.on('closed', function () {
+        // Dereference the window object, usually you would store windows
+        // in an array if your app supports multi windows, this is the time
+        // when you should delete the corresponding element.
+        mainWindow = null;
+        secWindow = null;
+        app.quit()
+    })
 }
 
 // This method will be called when Electron has finished
@@ -72,19 +76,19 @@ app.on('ready', createWindow)
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+    // On OS X it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+    if (process.platform !== 'darwin') {
+        app.quit()
+    }
 })
 
 app.on('activate', function () {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
-    createWindow()
-  }
+    // On OS X it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (mainWindow === null) {
+        createWindow()
+    }
 })
 
 // In this file you can include the rest of your app's specific main process

@@ -3,12 +3,15 @@
   <head>
     <meta charset="UTF-8">
     <title>Hello World!</title>
-    <link href="./../css/bootstrap.min.css">
-    <link href="./../css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="./../css/bootstrap.min.css">
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="./../js/jquery-2.2.0.min.js"></script>
+    <script>if (window.module) module = window.module;</script>
   </head>
   <body>
     <h1>Hello second World!</h1>
-    <input type="range" min="0" max="100" value="0" onchange="changeValue(this.value)">
+    <input id="rangIn" class="form-control" type="range" min="0" max="100" value="0" oninput="changeValue(this.value)">
+    <button class="btn btn-default" onclick="clickChange()">Change Video</button>
     <!-- All of the Node.js APIs are available in this renderer process. -->
     We are using Node.js <script>document.write(process.versions.node)</script>,
     Chromium <script>document.write(process.versions.chrome)</script>,
@@ -20,8 +23,19 @@
     require('./../renderer.js');
     const {ipcRenderer} = require('electron')
 
-    function changeValue (value) {
-        ipcRenderer.send('opacity-changed', value);
+    function clickChange () {
+        var val = $("#rangIn").val();
+        if (val > 50) {
+            changeValue(0, true);
+            $("#rangIn").val(0);
+        } else {
+            changeValue(100, true);
+            $("#rangIn").val(100);
+        }
+    }
+
+    function changeValue (value, animate) {
+        ipcRenderer.send('opacity-changed', {"value": value, "animate": animate});
     }
   </script>
 </html>
